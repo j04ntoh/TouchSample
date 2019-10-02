@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 179946675}
   m_Layer: 5
   m_Name: Canvas
-  m_TagString: Untagged
+  m_TagString: Canvas
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -410,6 +410,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefab: {fileID: 8828958179708616123, guid: 7f7e9ec4875a5424cbb0ae8b056038dc, type: 3}
+  canvas: {fileID: 179946678}
 --- !u!4 &1733321120
 Transform:
   m_ObjectHideFlags: 0

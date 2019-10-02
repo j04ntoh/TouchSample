@@ -1,18 +1,28 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TouchScript;
 using TouchScript.Pointers;
 
 public class ObjectMarker
 {
-    public int MarkerID;
+    public int PointerID = -1;
     public GameObject gameObj;
+
+    public void Init(Transform layer, int id)
+    {
+        byte customColor = (byte)Random.Range(0, 255);
+        gameObj.GetComponent<Image>().color = new Color32(customColor, customColor, customColor, 255);
+        gameObj.SetActive(false);
+        gameObj.transform.SetParent(layer, false);
+    }
 }
 
 public class TouchController : MonoBehaviour
 {
     public GameObject prefab;
+    public Transform canvas;
     public ObjectMarker[] objectMarker;
 
     private static TouchController _instance;
@@ -30,14 +40,15 @@ public class TouchController : MonoBehaviour
     }
     private void Start()
     {
-        //for (int i = 0; i < objectMarker.Length; i++)
-        //{
-        //    marker.GetComponent<MarkerObjectClass>().MarkerGO.GetComponent<MarkerNode>().Init(
-        //                                                                    Mathf.FloorToInt(i / 4),
-        //                                                                    i % 4);
-        //    objectMarker[i].gameObj = Instantiate(marker, new Vector3(0, 0, 0), Quaternion.identity);
-        //    objectMarker[i].gameObj.transform.SetParent(GameObject.FindGameObjectWithTag("Canvas").transform, false);
-        //}
+        canvas = GameObject.FindGameObjectWithTag("Canvas").transform;
+        objectMarker = new ObjectMarker[2];
+
+        for (int i = 0; i < objectMarker.Length; i++)
+        {
+            objectMarker[i] = new ObjectMarker();
+            objectMarker[i].gameObj = Instantiate(prefab, new Vector3(0, 0, 0), Quaternion.identity);
+            objectMarker[i].Init(canvas, i);
+        }
     }
     private void OnEnable()
     {
@@ -69,14 +80,16 @@ public class TouchController : MonoBehaviour
                 {
                     ObjectPointer op = (ObjectPointer)pointer;
                     Vector2 position = op.Position;
-                    Debug.Log("ADDED: "+position + op.ObjectId.ToString());
-                //    getMarker(op.ObjectId);
+                //    Debug.Log("ADDED: "+position + op.ObjectId.ToString());
+                    int newid = InitPoint();
+                    if(newid != -1)
+                        objectMarker[newid].PointerID = op.ObjectId;
+                    getMarker(op.ObjectId);
                 }
             }
         }
 
     }
-
     void pointerUpdatedHander(object sender, PointerEventArgs e)
     {
         lock (this)
@@ -87,7 +100,7 @@ public class TouchController : MonoBehaviour
                 {
                     ObjectPointer op = (ObjectPointer)pointer;
                     Vector2 position = op.Position;
-                //    moveMarker(op.ObjectId, position);
+                    moveMarker(op.ObjectId, position);
                 }
             }
         }
@@ -103,19 +116,37 @@ public class TouchController : MonoBehaviour
                 {
                     ObjectPointer op = (ObjectPointer)pointer;
                     Vector2 position = op.Position;
-                    Debug.Log("REMOVED: "+position + op.ObjectId.ToString());
-                //    hideMarker(op.ObjectId);
+                //    Debug.Log("REMOVED: "+position + op.ObjectId.ToString());
+                    hideMarker(op.ObjectId);
                 }
             }
+        }
+    }
+    public int InitPoint()
+    {
+        for(int i=0; i<objectMarker.Length; i++)
+        {
+            if (!objectMarker[i].gameObj.activeInHierarchy)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+    public void RemovePoint(int id)
+    {
+        for (int i = 0; i < objectMarker.Length; i++)
+        {
+            if (objectMarker[i].PointerID == id)
+                objectMarker[i].PointerID = -i;
         }
     }
     public void getMarker(int id)
     {
         foreach (ObjectMarker o in objectMarker)
         {
-            if (o.MarkerID == id)
+            if (o.PointerID == id)
             {
-                //    flagObject = true;
                 o.gameObj.transform.SetAsLastSibling();
                 o.gameObj.SetActive(true);
             }
@@ -125,7 +156,7 @@ public class TouchController : MonoBehaviour
     {
         foreach (ObjectMarker o in objectMarker)
         {
-            if (o.MarkerID == id)
+            if (o.PointerID == id)
             {
                 o.gameObj.transform.position = new Vector3(pos.x, pos.y, 1);
             }
@@ -136,7 +167,7 @@ public class TouchController : MonoBehaviour
     {
         foreach (ObjectMarker o in objectMarker)
         {
-            if (o.MarkerID == id)
+            if (o.PointerID == id)
             {
                 o.gameObj.SetActive(false);
             }
