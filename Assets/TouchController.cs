@@ -139,7 +139,7 @@ public class TouchController : MonoBehaviour
         for (int i = 0; i < objectMarker.Length; i++)
         {
             if (objectMarker[i].PointerID == id)
-                objectMarker[i].PointerID = -i;
+                objectMarker[i].PointerID = -1;
         }
     }
     public void getMarker(int id)
