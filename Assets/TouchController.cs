@@ -21,6 +21,7 @@ public class ObjectMarker
 
 public class TouchController : MonoBehaviour
 {
+    public int numHands = 3;
     public GameObject prefab;
     public Transform canvas;
     public ObjectMarker[] objectMarker;
@@ -41,7 +42,7 @@ public class TouchController : MonoBehaviour
     private void Start()
     {
         canvas = GameObject.FindGameObjectWithTag("Canvas").transform;
-        objectMarker = new ObjectMarker[2];
+        objectMarker = new ObjectMarker[numHands];
 
         for (int i = 0; i < objectMarker.Length; i++)
         {
